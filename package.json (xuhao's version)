@@ -1,8 +1,12 @@
 {
-"name": "youtube-idea-rater",
-"version": "1.0.0",
-"type": "module",
-"scripts": {
-"start": "node server.js"
-}
+  "name": "yt-idea-rater",
+  "version": "1.0.0",
+  "description": "YouTube Idea Rater with AI analysis",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
