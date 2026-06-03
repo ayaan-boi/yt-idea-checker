@@ -1,0 +1,365 @@
+
+
+<h2 class="sr-only">YouTube Video Idea Rater — searches real YouTube videos to benchmark your idea</h2>
+
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font-sans);background:transparent;color:var(--color-text-primary)}
+
+  .wrap{padding:1rem 0 2rem}
+
+  .logo{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .yt-badge{background:#FF0000;color:#fff;font-size:11px;font-weight:500;padding:4px 9px;border-radius:4px;letter-spacing:.04em;display:flex;align-items:center;gap:5px}
+  .yt-badge i{font-size:14px}
+  .app-title{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+  .app-sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:1.5rem}
+
+  .card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:12px}
+
+  .field-label{font-size:12px;color:var(--color-text-secondary);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .field-label i{font-size:14px}
+
+  textarea{width:100%;min-height:80px;resize:vertical;font-size:14px;padding:10px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);line-height:1.5}
+  textarea:focus{outline:none;border-color:var(--color-border-primary);box-shadow:0 0 0 2px rgba(0,0,0,.06)}
+  textarea::placeholder{color:var(--color-text-tertiary);font-size:13px}
+
+  .key-row{display:flex;gap:8px;align-items:flex-end}
+  .key-row input{flex:1;font-size:13px;padding:8px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-mono)}
+  .key-row input:focus{outline:none;box-shadow:0 0 0 2px rgba(0,0,0,.06)}
+  .key-row input::placeholder{font-family:var(--font-sans);color:var(--color-text-tertiary)}
+
+  .key-hint{font-size:11px;color:var(--color-text-tertiary);margin-top:4px}
+  .key-hint a{color:var(--color-text-info)}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  select{width:100%;font-size:13px;padding:8px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary)}
+  select:focus{outline:none}
+
+  .btn-primary{width:100%;padding:11px;border-radius:var(--border-radius-md);border:none;background:#FF0000;color:#fff;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+  .btn-primary:hover{opacity:.85}
+  .btn-primary:active{transform:scale(.98)}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed}
+
+  .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .error-box{background:var(--color-background-danger);border:0.5px solid var(--color-border-danger);border-radius:var(--border-radius-md);padding:10px 14px;font-size:13px;color:var(--color-text-danger);display:flex;gap:8px;align-items:flex-start;margin-top:10px}
+  .error-box i{flex-shrink:0;margin-top:1px}
+
+  .results{margin-top:4px}
+  .section-title{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-secondary);margin-bottom:8px}
+
+  .score-card{display:flex;gap:1.25rem;align-items:center}
+  .score-donut{position:relative;flex-shrink:0}
+  .score-donut svg{display:block}
+  .score-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:26px;font-weight:500;line-height:1}
+  .score-num span{font-size:11px;font-weight:400;color:var(--color-text-secondary)}
+  .score-meta{flex:1}
+  .verdict-pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;margin-bottom:6px}
+  .verdict-text{font-size:16px;font-weight:500;line-height:1.4;margin-bottom:4px}
+  .verdict-sub{font-size:13px;color:var(--color-text-secondary);line-height:1.5}
+
+  .metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .metric-box{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem 1rem;text-align:center}
+  .metric-val{font-size:22px;font-weight:500}
+  .metric-lbl{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+  .metric-bar{height:3px;background:var(--color-border-tertiary);border-radius:2px;margin-top:6px;overflow:hidden}
+  .metric-fill{height:100%;border-radius:2px;transition:width .7s ease}
+
+  .video-list{display:flex;flex-direction:column;gap:8px}
+  .video-item{display:flex;gap:12px;align-items:flex-start;padding:10px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);cursor:pointer;transition:background .12s;text-decoration:none}
+  .video-item:hover{background:var(--color-background-tertiary)}
+  .video-thumb{width:88px;height:52px;border-radius:4px;object-fit:cover;flex-shrink:0;background:var(--color-border-tertiary)}
+  .video-thumb-ph{width:88px;height:52px;border-radius:4px;flex-shrink:0;background:var(--color-background-tertiary);display:flex;align-items:center;justify-content:center;color:var(--color-text-tertiary)}
+  .video-info{flex:1;min-width:0}
+  .video-title{font-size:13px;font-weight:500;line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .video-stats{display:flex;gap:10px;flex-wrap:wrap}
+  .vstat{font-size:11px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px}
+  .vstat i{font-size:12px}
+
+  .benchmark-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .bench-box{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem 1rem}
+  .bench-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:3px}
+  .bench-val{font-size:18px;font-weight:500}
+
+  .bullet-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .bullet-list li{display:flex;gap:8px;font-size:13px;line-height:1.5;align-items:flex-start}
+  .bullet-list li i{flex-shrink:0;margin-top:2px;font-size:14px}
+
+  .tag-row{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{font-size:12px;padding:3px 10px;border-radius:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary)}
+</style>
+
+<div class="wrap">
+  <div class="logo">
+    <div class="yt-badge"><i class="ti ti-brand-youtube" aria-hidden="true"></i> YouTube API</div>
+    <div class="app-title">Idea Rater</div>
+  </div>
+  <div class="app-sub">Search real YouTube data to benchmark your video idea</div>
+
+  <div class="card">
+    <div class="field-label"><i class="ti ti-key" aria-hidden="true"></i> YouTube Data API v3 key</div>
+    <div class="key-row">
+      <input type="password" id="apiKey" placeholder="AIza..." autocomplete="off" />
+    </div>
+    <div class="key-hint">Get a free key at <a href="https://console.cloud.google.com/" target="_blank">console.cloud.google.com</a> → Enable "YouTube Data API v3"</div>
+  </div>
+
+  <div class="card">
+    <div class="field-label"><i class="ti ti-bulb" aria-hidden="true"></i> Your video idea</div>
+    <textarea id="ideaInput" placeholder="e.g. I spent 30 days eating only street food in Tokyo — here's what happened to my body…"></textarea>
+    <div class="grid2" style="margin-top:10px">
+      <div>
+        <div class="field-label" style="margin-top:8px"><i class="ti ti-category" aria-hidden="true"></i> Niche</div>
+        <select id="nicheSelect">
+          <option value="general">General / Lifestyle</option>
+          <option value="gaming">Gaming</option>
+          <option value="tech">Tech & Reviews</option>
+          <option value="finance">Finance & Business</option>
+          <option value="food">Food & Cooking</option>
+          <option value="travel">Travel & Vlog</option>
+          <option value="fitness">Fitness & Health</option>
+          <option value="education">Education & How-to</option>
+          <option value="entertainment">Entertainment</option>
+          <option value="beauty">Beauty & Fashion</option>
+        </select>
+      </div>
+      <div>
+        <div class="field-label" style="margin-top:8px"><i class="ti ti-users" aria-hidden="true"></i> Channel size</div>
+        <select id="sizeSelect">
+          <option value="starter">Starter (0–1K)</option>
+          <option value="small">Small (1K–10K)</option>
+          <option value="medium" selected>Medium (10K–100K)</option>
+          <option value="large">Large (100K–1M)</option>
+          <option value="mega">Mega (1M+)</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-primary" id="rateBtn" onclick="runRating()" style="margin-top:12px">
+      <i class="ti ti-search" aria-hidden="true"></i> Search YouTube & Rate
+    </button>
+    <div id="errorBox" style="display:none"></div>
+  </div>
+
+  <div id="resultsArea" style="display:none" class="results"></div>
+</div>
+
+<script>
+function fmt(n){
+  if(n===undefined||n===null)return'—';
+  n=parseInt(n)||0;
+  if(n>=1000000)return(n/1000000).toFixed(1)+'M';
+  if(n>=1000)return(n/1000).toFixed(1)+'K';
+  return n.toLocaleString();
+}
+function ago(iso){
+  if(!iso)return'';
+  const d=new Date(iso),now=new Date();
+  const dy=Math.floor((now-d)/86400000);
+  if(dy<1)return'today';
+  if(dy<30)return dy+'d ago';
+  if(dy<365)return Math.floor(dy/30)+'mo ago';
+  return Math.floor(dy/365)+'yr ago';
+}
+function scoreCol(s){
+  if(s>=72)return'#3b9c2a';
+  if(s>=50)return'#c47d0e';
+  return'#cc3333';
+}
+
+async function searchYouTube(query, apiKey, maxResults=8){
+  const url=`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=${maxResults}&order=relevance&key=${encodeURIComponent(apiKey)}`;
+  const r=await fetch(url);
+  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'YouTube API error '+r.status);}
+  return r.json();
+}
+
+async function getVideoStats(ids, apiKey){
+  const url=`https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=${ids.join(',')}&key=${encodeURIComponent(apiKey)}`;
+  const r=await fetch(url);
+  if(!r.ok)throw new Error('Stats fetch failed');
+  return r.json();
+}
+
+function computeScore(videos, idea){
+  if(!videos.length)return{score:30,clickability:30,demand:30,competition:50};
+  const views=videos.map(v=>parseInt(v.stats?.viewCount)||0);
+  const likes=videos.map(v=>parseInt(v.stats?.likeCount)||0);
+  const avgViews=views.reduce((a,b)=>a+b,0)/views.length;
+  const maxViews=Math.max(...views);
+  const avgLikes=likes.reduce((a,b)=>a+b,0)/likes.length;
+  const engRate=avgViews>0?(avgLikes/avgViews)*100:0;
+
+  const demandScore=Math.min(100,Math.round(Math.log10(avgViews+1)*18));
+  const clickScore=Math.min(100,Math.round(50+engRate*15));
+  const competitionScore=Math.min(100,Math.round(Math.log10(maxViews+1)*16));
+  const overall=Math.round((demandScore*0.4)+(clickScore*0.35)+((100-competitionScore)*0.25));
+  return{score:Math.max(10,Math.min(99,overall)),demand:demandScore,clickability:clickScore,competition:competitionScore,avgViews,avgLikes};
+}
+
+function verdict(score){
+  if(score>=80)return{label:'Banger',color:'#2d7d1a',bg:'#eaf3de'};
+  if(score>=65)return{label:'Strong',color:'#2d7d1a',bg:'#eaf3de'};
+  if(score>=50)return{label:'Solid',color:'#8a5a00',bg:'#faeeda'};
+  if(score>=35)return{label:'Risky',color:'#8a5a00',bg:'#faeeda'};
+  return{label:'Pass',color:'#a32d2d',bg:'#fcebeb'};
+}
+
+function showError(msg){
+  const el=document.getElementById('errorBox');
+  el.innerHTML=`<div class="error-box"><i class="ti ti-alert-circle" aria-hidden="true"></i><span>${msg}</span></div>`;
+  el.style.display='block';
+}
+function hideError(){document.getElementById('errorBox').style.display='none';}
+
+async function runRating(){
+  const key=document.getElementById('apiKey').value.trim();
+  const idea=document.getElementById('ideaInput').value.trim();
+  const niche=document.getElementById('nicheSelect').value;
+  const size=document.getElementById('sizeSelect').value;
+  const btn=document.getElementById('rateBtn');
+  const resultsArea=document.getElementById('resultsArea');
+
+  hideError();
+  if(!key){showError('Please enter your YouTube Data API v3 key.');return;}
+  if(!idea){showError('Please enter your video idea.');return;}
+
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner"></div> Searching YouTube…';
+  resultsArea.style.display='none';
+
+  try{
+    const searchQuery=idea.length>80?idea.slice(0,80):idea;
+    const searchData=await searchYouTube(searchQuery, key, 8);
+    const items=searchData.items||[];
+    if(!items.length)throw new Error('No YouTube results found. Try a broader idea.');
+
+    const ids=items.map(i=>i.id?.videoId).filter(Boolean);
+    const statsData=await getVideoStats(ids, key);
+    const statsMap={};
+    (statsData.items||[]).forEach(v=>{statsMap[v.id]=v.statistics;});
+
+    const videos=items.map(item=>{
+      const id=item.id?.videoId;
+      return{
+        id,title:item.snippet?.title,channel:item.snippet?.channelTitle,
+        thumbnail:item.snippet?.thumbnails?.medium?.url||item.snippet?.thumbnails?.default?.url,
+        publishedAt:item.snippet?.publishedAt,
+        url:`https://www.youtube.com/watch?v=${id}`,
+        stats:statsMap[id]||{}
+      };
+    }).filter(v=>v.id);
+
+    const sc=computeScore(videos, idea);
+    const v=verdict(sc.score);
+    renderResults({score:sc,verdict:v,videos,idea,niche,size});
+    resultsArea.style.display='block';
+  }catch(e){
+    showError(e.message||'Something went wrong. Check your API key and try again.');
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='<i class="ti ti-refresh" aria-hidden="true"></i> Search Again';
+  }
+}
+
+function renderResults({score,verdict,videos,idea,niche,size}){
+  const area=document.getElementById('resultsArea');
+  const sc=score.score;
+  const col=scoreCol(sc);
+  const r=46;const circ=2*Math.PI*r;const dash=(sc/100)*circ;
+
+  const oneLinerMap={
+    'Banger':'This idea has strong viral potential — the data backs it up.',
+    'Strong':'Solid demand with good engagement signals. Worth making.',
+    'Solid':'Decent opportunity, but execution and timing will matter.',
+    'Risky':'Crowded space or low demand. Differentiation is essential.',
+    'Pass':'The data suggests limited upside. Consider pivoting the angle.'
+  };
+  const oneLiner=oneLinerMap[verdict.label];
+
+  const avgViewsStr=fmt(score.avgViews);
+  const topVideo=videos.reduce((a,b)=>(parseInt(b.stats?.viewCount||0)>parseInt(a.stats?.viewCount||0)?b:a),videos[0]);
+  const totalVideos=videos.length;
+
+  area.innerHTML=`
+    <div class="card">
+      <div class="section-title">Overall score</div>
+      <div class="score-card">
+        <div class="score-donut">
+          <svg width="108" height="108" viewBox="0 0 108 108" aria-hidden="true">
+            <circle cx="54" cy="54" r="${r}" fill="none" stroke="var(--color-border-tertiary)" stroke-width="7"/>
+            <circle cx="54" cy="54" r="${r}" fill="none" stroke="${col}" stroke-width="7"
+              stroke-dasharray="${dash.toFixed(1)} ${(circ-dash).toFixed(1)}"
+              stroke-linecap="round" transform="rotate(-90 54 54)"/>
+          </svg>
+          <div class="score-num" style="color:${col}">${sc}<span>/ 100</span></div>
+        </div>
+        <div class="score-meta">
+          <div class="verdict-pill" style="background:${verdict.bg};color:${verdict.color}">
+            <i class="ti ti-flame" aria-hidden="true"></i> ${verdict.label}
+          </div>
+          <div class="verdict-text">${idea.length>60?idea.slice(0,60)+'…':idea}</div>
+          <div class="verdict-sub">${oneLiner}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Signal breakdown</div>
+      <div class="metrics-row">
+        ${[
+          {label:'Search demand',val:score.demand,col:scoreCol(score.demand)},
+          {label:'Clickability',val:score.clickability,col:scoreCol(score.clickability)},
+          {label:'Competition',val:score.competition,col:scoreCol(score.competition)}
+        ].map(m=>`
+          <div class="metric-box">
+            <div class="metric-val" style="color:${m.col}">${m.val}</div>
+            <div class="metric-lbl">${m.label}</div>
+            <div class="metric-bar"><div class="metric-fill" style="width:${m.val}%;background:${m.col}"></div></div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Benchmark — real YouTube data</div>
+      <div class="benchmark-row" style="margin-bottom:10px">
+        <div class="bench-box">
+          <div class="bench-label"><i class="ti ti-eye" style="font-size:12px" aria-hidden="true"></i> Avg views (similar videos)</div>
+          <div class="bench-val">${avgViewsStr}</div>
+        </div>
+        <div class="bench-box">
+          <div class="bench-label"><i class="ti ti-video" style="font-size:12px" aria-hidden="true"></i> Similar videos found</div>
+          <div class="bench-val">${totalVideos}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Top competing videos on YouTube</div>
+      <div class="video-list">
+        ${videos.slice(0,6).map(v=>`
+          <a class="video-item" href="${v.url}" target="_blank" rel="noopener" aria-label="${v.title}">
+            ${v.thumbnail
+              ?`<img class="video-thumb" src="${v.thumbnail}" alt="" loading="lazy"/>`
+              :`<div class="video-thumb-ph"><i class="ti ti-brand-youtube" style="font-size:20px" aria-hidden="true"></i></div>`}
+            <div class="video-info">
+              <div class="video-title">${v.title||'Untitled'}</div>
+              <div class="video-stats">
+                <span class="vstat"><i class="ti ti-eye" aria-hidden="true"></i> ${fmt(v.stats?.viewCount)}</span>
+                <span class="vstat"><i class="ti ti-thumb-up" aria-hidden="true"></i> ${fmt(v.stats?.likeCount)}</span>
+                <span class="vstat"><i class="ti ti-user" aria-hidden="true"></i> ${v.channel||'—'}</span>
+                <span class="vstat"><i class="ti ti-clock" aria-hidden="true"></i> ${ago(v.publishedAt)}</span>
+              </div>
+            </div>
+            <i class="ti ti-external-link" style="font-size:14px;color:var(--color-text-tertiary);flex-shrink:0;margin-top:2px" aria-hidden="true"></i>
+          </a>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById('ideaInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))runRating();
+});
+</script>
