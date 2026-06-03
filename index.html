@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>YouTube Idea Rater — AI Powered</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.14.0/dist/tabler-icons.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f5f5f4;color:#1a1a1a;min-height:100vh}
+.wrap{max-width:640px;margin:0 auto;padding:2rem 1rem 4rem}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.yt-badge{background:#FF0000;color:#fff;font-size:11px;font-weight:500;padding:4px 9px;border-radius:4px;letter-spacing:.04em;display:flex;align-items:center;gap:5px}
+.ai-badge{background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:500;padding:4px 9px;border-radius:4px;letter-spacing:.04em;display:flex;align-items:center;gap:5px}
+.app-title{font-size:20px;font-weight:500}
+.app-sub{font-size:13px;color:#6b7280;margin-bottom:1.5rem}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1rem 1.25rem;margin-bottom:12px}
+.field-label{font-size:12px;color:#6b7280;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+textarea{width:100%;min-height:80px;resize:vertical;font-size:14px;padding:10px 12px;border-radius:8px;border:1px solid #d1d5db;background:#f9fafb;color:#1a1a1a;font-family:inherit;line-height:1.5}
+textarea:focus{outline:none;border-color:#9ca3af;box-shadow:0 0 0 2px rgba(0,0,0,.06)}
+textarea::placeholder{color:#9ca3af;font-size:13px}
+.input-field{width:100%;font-size:13px;padding:8px 12px;border-radius:8px;border:1px solid #d1d5db;background:#f9fafb;color:#1a1a1a;font-family:monospace}
+.input-field:focus{outline:none;border-color:#9ca3af}
+.input-field::placeholder{font-family:system-ui,sans-serif;color:#9ca3af}
+.key-hint{font-size:11px;color:#9ca3af;margin-top:4px}
+.key-hint a{color:#2563eb}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+select{width:100%;font-size:13px;padding:8px 12px;border-radius:8px;border:1px solid #d1d5db;background:#f9fafb;color:#1a1a1a}
+.btn-primary{width:100%;padding:11px;border-radius:8px;border:none;background:#FF0000;color:#fff;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+.btn-primary:hover{opacity:.85}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+.spinner-dark{width:14px;height:14px;border:2px solid #d1d5db;border-top-color:#1a1a1a;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#b91c1c;display:flex;gap:8px;align-items:flex-start;margin-top:10px}
+.results{margin-top:4px}
+.section-title{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:#6b7280;margin-bottom:8px}
+.score-card{display:flex;gap:1.25rem;align-items:center}
+.score-donut{position:relative;flex-shrink:0}
+.score-donut svg{display:block}
+.score-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:26px;font-weight:500;line-height:1}
+.score-num span{font-size:11px;font-weight:400;color:#6b7280}
+.score-meta{flex:1}
+.verdict-pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;margin-bottom:6px}
+.verdict-text{font-size:16px;font-weight:500;line-height:1.4;margin-bottom:4px}
+.verdict-sub{font-size:13px;color:#6b7280;line-height:1.5}
+.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.metric-box{background:#f9fafb;border-radius:8px;padding:.75rem 1rem;text-align:center}
+.metric-val{font-size:22px;font-weight:500}
+.metric-lbl{font-size:11px;color:#6b7280;margin-top:2px}
+.metric-bar{height:3px;background:#e5e7eb;border-radius:2px;margin-top:6px;overflow:hidden}
+.metric-fill{height:100%;border-radius:2px}
+.video-list{display:flex;flex-direction:column;gap:8px}
+.video-item{display:flex;gap:12px;align-items:flex-start;padding:10px;background:#f9fafb;border-radius:8px;cursor:pointer;text-decoration:none;color:inherit}
+.video-item:hover{background:#f3f4f6}
+.video-thumb{width:88px;height:52px;border-radius:4px;object-fit:cover;flex-shrink:0;background:#e5e7eb}
+.video-info{flex:1;min-width:0}
+.video-title{font-size:13px;font-weight:500;line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.video-stats{display:flex;gap:10px;flex-wrap:wrap}
+.vstat{font-size:11px;color:#6b7280;display:flex;align-items:center;gap:3px}
+.benchmark-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.bench-box{background:#f9fafb;border-radius:8px;padding:.75rem 1rem}
+.bench-label{font-size:11px;color:#6b7280;margin-bottom:3px}
+.bench-val{font-size:18px;font-weight:500}
+.ai-section{border-top:1px solid #e5e7eb;margin-top:12px;padding-top:12px}
+.ai-loading{display:flex;align-items:center;gap:10px;font-size:13px;color:#6b7280;padding:8px 0}
+.ai-badge-inline{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;background:#eff6ff;color:#1d4ed8;margin-bottom:10px}
+.insight-item{display:flex;gap:10px;margin-bottom:10px;font-size:13px;line-height:1.6;align-items:flex-start}
+.insight-icon{flex-shrink:0;margin-top:2px;font-size:16px}
+.hook-box{background:#f9fafb;border-radius:8px;padding:.75rem 1rem;margin-bottom:8px}
+.hook-num{font-size:11px;color:#6b7280;margin-bottom:3px}
+.hook-text{font-size:13px;font-weight:500;line-height:1.5}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tag{font-size:12px;padding:3px 10px;border-radius:20px;background:#f3f4f6;border:1px solid #e5e7eb;color:#6b7280}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <div class="yt-badge"><i class="ti ti-brand-youtube"></i> YouTube API</div>
+    <div class="ai-badge"><i class="ti ti-sparkles"></i> AI Analysis</div>
+    <div class="app-title">Idea Rater</div>
+  </div>
+  <div class="app-sub">Real YouTube data + Claude AI to deeply analyse your video idea</div>
+
+  <div class="card">
+    <div class="field-label"><i class="ti ti-key"></i> YouTube Data API v3 key</div>
+    <input type="password" class="input-field" id="ytKey" placeholder="AIza…" autocomplete="off"/>
+    <div class="key-hint" style="margin-top:4px">Free at <a href="https://console.cloud.google.com/" target="_blank">console.cloud.google.com</a> → Enable "YouTube Data API v3"</div>
+  </div>
+
+  <div class="card">
+    <div class="field-label"><i class="ti ti-bulb"></i> Your video idea</div>
+    <textarea id="ideaInput" placeholder="e.g. I spent 30 days eating only street food in Tokyo — here's what happened to my body…"></textarea>
+    <div class="grid2" style="margin-top:10px">
+      <div>
+        <div class="field-label" style="margin-top:8px"><i class="ti ti-category"></i> Niche</div>
+        <select id="nicheSelect">
+          <option value="general">General / Lifestyle</option>
+          <option value="gaming">Gaming</option>
+          <option value="tech">Tech & Reviews</option>
+          <option value="finance">Finance & Business</option>
+          <option value="food">Food & Cooking</option>
+          <option value="travel">Travel & Vlog</option>
+          <option value="fitness">Fitness & Health</option>
+          <option value="education">Education & How-to</option>
+          <option value="entertainment">Entertainment</option>
+          <option value="beauty">Beauty & Fashion</option>
+        </select>
+      </div>
+      <div>
+        <div class="field-label" style="margin-top:8px"><i class="ti ti-users"></i> Channel size</div>
+        <select id="sizeSelect">
+          <option value="starter">Starter (0–1K)</option>
+          <option value="small">Small (1K–10K)</option>
+          <option value="medium" selected>Medium (10K–100K)</option>
+          <option value="large">Large (100K–1M)</option>
+          <option value="mega">Mega (1M+)</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-primary" id="rateBtn" onclick="runRating()" style="margin-top:12px">
+      <i class="ti ti-search"></i> Search YouTube & Rate with AI
+    </button>
+    <div id="errorBox" style="display:none"></div>
+  </div>
+
+  <div id="resultsArea" style="display:none" class="results"></div>
+</div>
+
+<script>
+function fmt(n){if(n===undefined||n===null)return'—';n=parseInt(n)||0;if(n>=1000000)return(n/1000000).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(1)+'K';return n.toLocaleString()}
+function ago(iso){if(!iso)return'';const d=new Date(iso),now=new Date();const dy=Math.floor((now-d)/86400000);if(dy<1)return'today';if(dy<30)return dy+'d ago';if(dy<365)return Math.floor(dy/30)+'mo ago';return Math.floor(dy/365)+'yr ago'}
+function scoreCol(s){if(s>=72)return'#16a34a';if(s>=50)return'#d97706';return'#dc2626'}
+
+async function searchYouTube(query,key,max=8){
+  const r=await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=${max}&order=relevance&key=${encodeURIComponent(key)}`);
+  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'YouTube API error '+r.status)}
+  return r.json()
+}
+async function getVideoStats(ids,key){
+  const r=await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=${ids.join(',')}&key=${encodeURIComponent(key)}`);
+  if(!r.ok)throw new Error('Stats fetch failed');
+  return r.json()
+}
+function computeScore(videos){
+  if(!videos.length)return{score:30,clickability:30,demand:30,competition:50,avgViews:0,avgLikes:0};
+  const views=videos.map(v=>parseInt(v.stats?.viewCount)||0);
+  const likes=videos.map(v=>parseInt(v.stats?.likeCount)||0);
+  const avgViews=views.reduce((a,b)=>a+b,0)/views.length;
+  const maxViews=Math.max(...views);
+  const avgLikes=likes.reduce((a,b)=>a+b,0)/likes.length;
+  const engRate=avgViews>0?(avgLikes/avgViews)*100:0;
+  const demandScore=Math.min(100,Math.round(Math.log10(avgViews+1)*18));
+  const clickScore=Math.min(100,Math.round(50+engRate*15));
+  const competitionScore=Math.min(100,Math.round(Math.log10(maxViews+1)*16));
+  const overall=Math.round((demandScore*0.4)+(clickScore*0.35)+((100-competitionScore)*0.25));
+  return{score:Math.max(10,Math.min(99,overall)),demand:demandScore,clickability:clickScore,competition:competitionScore,avgViews,avgLikes}
+}
+function verdict(score){
+  if(score>=80)return{label:'Banger',color:'#14532d',bg:'#dcfce7'};
+  if(score>=65)return{label:'Strong',color:'#14532d',bg:'#dcfce7'};
+  if(score>=50)return{label:'Solid',color:'#78350f',bg:'#fef3c7'};
+  if(score>=35)return{label:'Risky',color:'#78350f',bg:'#fef3c7'};
+  return{label:'Pass',color:'#7f1d1d',bg:'#fee2e2'}
+}
+function showError(msg){
+  const el=document.getElementById('errorBox');
+  el.innerHTML=`<div class="error-box"><i class="ti ti-alert-circle"></i><span>${msg}</span></div>`;
+  el.style.display='block'
+}
+function hideError(){document.getElementById('errorBox').style.display='none'}
+
+async function callClaude(prompt){
+  const key = document.getElementById('claudeKey')?.value?.trim();
+
+  if (!key) {
+    throw new Error("Please enter your Claude API key.");
+  }
+
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "x-api-key": key,
+      "anthropic-version": "2023-06-01",
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      messages: [
+        { role: "user", content: prompt }
+      ]
+    })
+  });
+
+  <div class="card">
+  <div class="field-label">
+    <i class="ti ti-sparkles"></i> Claude API key
+  </div>
+  <input type="password" class="input-field" id="claudeKey" placeholder="sk-ant-..." />
+</div>
+
+  const data = await r.json();
+
+  if (!r.ok) {
+    throw new Error(data.error?.message || "Claude API error");
+  }
+
+  return data.content.map(c => c.text || "").join("");
+}
+
+async function runRating(){
+  const key=document.getElementById('ytKey').value.trim();
+  const idea=document.getElementById('ideaInput').value.trim();
+  const niche=document.getElementById('nicheSelect').value;
+  const size=document.getElementById('sizeSelect').value;
+  const btn=document.getElementById('rateBtn');
+  const resultsArea=document.getElementById('resultsArea');
+  hideError();
+  if(!key){showError('Please enter your YouTube Data API v3 key.');return}
+  if(!idea){showError('Please enter your video idea.');return}
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner"></div> Searching YouTube…';
+  resultsArea.style.display='none';
+  try{
+    const searchData=await searchYouTube(idea.slice(0,80),key,8);
+    const items=searchData.items||[];
+    if(!items.length)throw new Error('No YouTube results found. Try a broader idea.');
+    const ids=items.map(i=>i.id?.videoId).filter(Boolean);
+    const statsData=await getVideoStats(ids,key);
+    const statsMap={};
+    (statsData.items||[]).forEach(v=>{statsMap[v.id]=v.statistics});
+    const videos=items.map(item=>{
+      const id=item.id?.videoId;
+      return{id,title:item.snippet?.title,channel:item.snippet?.channelTitle,thumbnail:item.snippet?.thumbnails?.medium?.url||item.snippet?.thumbnails?.default?.url,publishedAt:item.snippet?.publishedAt,url:`https://www.youtube.com/watch?v=${id}`,stats:statsMap[id]||{}}
+    }).filter(v=>v.id);
+    const sc=computeScore(videos);
+    const verd=verdict(sc.score);
+    renderResults({score:sc,verdict:verd,videos,idea,niche,size});
+    resultsArea.style.display='block';
+    btn.disabled=false;
+    btn.innerHTML='<i class="ti ti-refresh"></i> Search Again';
+    runAIAnalysis({videos,idea,niche,size,score:sc});
+  }catch(e){
+    showError(e.message||'Something went wrong.');
+    btn.disabled=false;
+    btn.innerHTML='<i class="ti ti-search"></i> Search YouTube & Rate with AI';
+  }
+}
+
+async function runAIAnalysis({videos,idea,niche,size,score}){
+  const aiEl=document.getElementById('aiAnalysisArea');
+  if(!aiEl)return;
+  aiEl.innerHTML=`<div class="ai-loading"><div class="spinner-dark"></div> Claude is analysing your idea against real YouTube data…</div>`;
+  const topVids=videos.slice(0,6).map(v=>`- "${v.title}" by ${v.channel} — ${fmt(v.stats?.viewCount)} views, ${fmt(v.stats?.likeCount)} likes`).join('\n');
+  const prompt=`You are an expert YouTube strategist. Analyse this video idea and the real competitor data found on YouTube.
+
+Video idea: "${idea}"
+Niche: ${niche}
+Channel size: ${size} subscribers
+
+Top competing videos found on YouTube right now:
+${topVids}
+
+Average views on similar videos: ${fmt(score.avgViews)}
+Data-based score: ${score.score}/100 (demand: ${score.demand}, clickability: ${score.clickability}, competition: ${score.competition})
+
+Respond ONLY with a JSON object and no extra text, backticks, or markdown. Use this exact structure:
+{
+  "aiScore": <integer 1-100, your adjusted overall score based on the data AND your strategic analysis>,
+  "scoreRationale": "<2 sentences explaining your adjusted score vs the raw data score>",
+  "strengths": ["<strength 1>","<strength 2>","<strength 3>"],
+  "weaknesses": ["<weakness 1>","<weakness 2>"],
+  "titleHooks": ["<rewritten catchy title 1>","<rewritten catchy title 2>","<rewritten catchy title 3>"],
+  "angles": ["<unique angle suggestion 1>","<unique angle suggestion 2>"],
+  "keywords": ["<keyword 1>","<keyword 2>","<keyword 3>","<keyword 4>","<keyword 5>"],
+  "verdict": "<one punchy sentence summarising if this is worth making>"
+}`;
+  try{
+    const raw=await callClaude(prompt);
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const d=JSON.parse(clean);
+    renderAI(d,score.score);
+  }catch(e){
+    aiEl.innerHTML=`<p style="font-size:13px;color:#6b7280">AI analysis unavailable: ${e.message}</p>`;
+  }
+}
+
+function renderAI(d,rawScore){
+  const aiEl=document.getElementById('aiAnalysisArea');
+  const delta=d.aiScore-rawScore;
+  const deltaStr=delta>0?`+${delta}`:String(delta);
+  const deltaCol=delta>0?'#16a34a':delta<0?'#dc2626':'#6b7280';
+  aiEl.innerHTML=`
+    <div class="ai-badge-inline"><i class="ti ti-sparkles"></i> Claude AI analysis</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;background:#f9fafb;border-radius:8px;padding:.75rem 1rem">
+      <div>
+        <div style="font-size:11px;color:#6b7280;margin-bottom:2px">AI-adjusted score</div>
+        <div style="font-size:28px;font-weight:500;color:${scoreCol(d.aiScore)}">${d.aiScore}<span style="font-size:13px;color:#6b7280">/100</span></div>
+      </div>
+      <div style="font-size:13px;color:${deltaCol};font-weight:500">${deltaStr} vs data score</div>
+      <div style="flex:1;font-size:12px;color:#6b7280;line-height:1.5">${d.scoreRationale||''}</div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div class="section-title">Strengths</div>
+      ${(d.strengths||[]).map(s=>`<div class="insight-item"><i class="ti ti-circle-check insight-icon" style="color:#16a34a"></i><span>${s}</span></div>`).join('')}
+    </div>
+    <div style="margin-bottom:12px">
+      <div class="section-title">Weaknesses / risks</div>
+      ${(d.weaknesses||[]).map(s=>`<div class="insight-item"><i class="ti ti-alert-triangle insight-icon" style="color:#d97706"></i><span>${s}</span></div>`).join('')}
+    </div>
+    <div style="margin-bottom:12px">
+      <div class="section-title">Suggested title hooks</div>
+      ${(d.titleHooks||[]).map((h,i)=>`<div class="hook-box"><div class="hook-num">Option ${i+1}</div><div class="hook-text">${h}</div></div>`).join('')}
+    </div>
+    <div style="margin-bottom:12px">
+      <div class="section-title">Unique angles to stand out</div>
+      ${(d.angles||[]).map(a=>`<div class="insight-item"><i class="ti ti-arrow-right insight-icon" style="color:#2563eb"></i><span>${a}</span></div>`).join('')}
+    </div>
+    <div>
+      <div class="section-title">Recommended keywords / tags</div>
+      <div class="tag-row">${(d.keywords||[]).map(k=>`<span class="tag">${k}</span>`).join('')}</div>
+    </div>
+    <div style="margin-top:14px;padding:10px 14px;border-radius:8px;border:1px solid #e5e7eb;background:#f9fafb">
+      <span style="font-size:13px;font-weight:500">${d.verdict||''}</span>
+    </div>
+  `;
+}
+
+function renderResults({score,verdict,videos,idea,niche,size}){
+  const area=document.getElementById('resultsArea');
+  const sc=score.score;
+  const col=scoreCol(sc);
+  const r=46;const circ=2*Math.PI*r;const dash=(sc/100)*circ;
+  area.innerHTML=`
+    <div class="card">
+      <div class="section-title">Overall score (data)</div>
+      <div class="score-card">
+        <div class="score-donut">
+          <svg width="108" height="108" viewBox="0 0 108 108">
+            <circle cx="54" cy="54" r="${r}" fill="none" stroke="#e5e7eb" stroke-width="7"/>
+            <circle cx="54" cy="54" r="${r}" fill="none" stroke="${col}" stroke-width="7"
+              stroke-dasharray="${dash.toFixed(1)} ${(circ-dash).toFixed(1)}"
+              stroke-linecap="round" transform="rotate(-90 54 54)"/>
+          </svg>
+          <div class="score-num" style="color:${col}">${sc}<span>/ 100</span></div>
+        </div>
+        <div class="score-meta">
+          <div class="verdict-pill" style="background:${verdict.bg};color:${verdict.color}">
+            <i class="ti ti-flame"></i> ${verdict.label}
+          </div>
+          <div class="verdict-text">${idea.length>60?idea.slice(0,60)+'…':idea}</div>
+          <div class="verdict-sub">AI analysis loading below…</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Signal breakdown</div>
+      <div class="metrics-row">
+        ${[{label:'Search demand',val:score.demand},{label:'Clickability',val:score.clickability},{label:'Competition',val:score.competition}].map(m=>`
+          <div class="metric-box">
+            <div class="metric-val" style="color:${scoreCol(m.val)}">${m.val}</div>
+            <div class="metric-lbl">${m.label}</div>
+            <div class="metric-bar"><div class="metric-fill" style="width:${m.val}%;background:${scoreCol(m.val)}"></div></div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Benchmark — real YouTube data</div>
+      <div class="benchmark-row">
+        <div class="bench-box"><div class="bench-label">Avg views</div><div class="bench-val">${fmt(score.avgViews)}</div></div>
+        <div class="bench-box"><div class="bench-label">Videos found</div><div class="bench-val">${videos.length}</div></div>
+      </div>
+      <div class="ai-section" id="aiAnalysisArea">
+        <div class="ai-loading"><div class="spinner-dark"></div> Waiting…</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Top competing videos on YouTube</div>
+      <div class="video-list">
+        ${videos.slice(0,6).map(v=>`
+          <a class="video-item" href="${v.url}" target="_blank" rel="noopener">
+            ${v.thumbnail?`<img class="video-thumb" src="${v.thumbnail}" alt="" loading="lazy"/>`:
+            `<div class="video-thumb" style="display:flex;align-items:center;justify-content:center;color:#9ca3af"><i class="ti ti-brand-youtube" style="font-size:20px"></i></div>`}
+            <div class="video-info">
+              <div class="video-title">${v.title||'Untitled'}</div>
+              <div class="video-stats">
+                <span class="vstat"><i class="ti ti-eye"></i> ${fmt(v.stats?.viewCount)}</span>
+                <span class="vstat"><i class="ti ti-thumb-up"></i> ${fmt(v.stats?.likeCount)}</span>
+                <span class="vstat"><i class="ti ti-user"></i> ${v.channel||'—'}</span>
+                <span class="vstat"><i class="ti ti-clock"></i> ${ago(v.publishedAt)}</span>
+              </div>
+            </div>
+            <i class="ti ti-external-link" style="font-size:14px;color:#9ca3af;flex-shrink:0;margin-top:2px"></i>
+          </a>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById('ideaInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))runRating()
+});
+</script>
+</body>
+</html>
