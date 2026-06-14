@@ -132,8 +132,7 @@ export default function Home() {
       <main className="main main-3col">
         <section className="hero hero-full no-print">
           <h1>
-            Score your next video <span className="accent">before</span> you
-            hit record.
+            Tube <span className="accent">Forecaster</span> you
           </h1>
           <p>
             Paste your channel and a video idea. Our AI predicts views, CTR,
