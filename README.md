@@ -1,9 +1,9 @@
 ## `Introduction` 
 
-```
+
 TubeForecaster is a web application that helps YouTube content creators predict
 statistics based on their several informations as inputs:
-```
+
 
 ```
 YouTube Channel URL
