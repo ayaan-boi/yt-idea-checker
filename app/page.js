@@ -132,11 +132,10 @@ export default function Home() {
       <main className="main main-3col">
         <section className="hero hero-full no-print">
           <h1>
-            Tube <span className="accent">Forecaster</span> you
+            Tube <span className="accent">Forecaster</span>
           </h1>
           <p>
-            Paste your channel and a video idea. Our AI predicts views, CTR,
-            and retention — then tells you exactly how to make it stronger.
+            Paste your channel and a video idea. Our AI tells you exactly how to make it stronger.
           </p>
         </section>
 
